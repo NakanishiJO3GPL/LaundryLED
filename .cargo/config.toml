@@ -3,6 +3,7 @@
 # - `probe-rs` provides flashing and defmt via a hardware debugger, and stack unwind on panic
 # - `picotool` loads an elf, skipping unchanged flash sectors, verify it, and execute it
 runner = "probe-rs run --chip RP235x --protocol swd"
+linker = "arm-none-eabi-ld"
 
 # Pass some extra options to rustc, some of which get passed on to the linker.
 #
@@ -17,7 +18,6 @@ runner = "probe-rs run --chip RP235x --protocol swd"
 rustflags = [
     "-C", "link-arg=--nmagic",
     "-C", "link-arg=-Tlink.x",
-    "-C", "link-arg=-Tdefmt.x",
     "-C", "target-cpu=cortex-m33",
 ]
 

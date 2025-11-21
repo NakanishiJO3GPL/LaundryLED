@@ -1,11 +1,11 @@
-//! Blinks the LED on a Pico board
-//!
-//! This will blink an LED attached to GP25, which is the pin the Pico uses for the on-board LED.
+//! Laundry LED Controller Firmware
+//! Copyright Panasonic Corporation 2025
+
 #![no_std]
 #![no_main]
 
 use core::cmp::min;
-
+use core::sync::atomic::{AtomicU32, Ordering};
 use defmt::*;
 use defmt_rtt as _;
 use embedded_hal::pwm::SetDutyCycle;
@@ -21,6 +21,9 @@ mod hidcust;
 // Provide an alias for our BSP so we can switch targets quickly.
 // Uncomment the BSP you included in Cargo.toml, the rest of the code does not need to change.
 // use some_bsp;
+
+static COUNT: AtomicU32 = AtomicU32::new(0);
+defmt::timestamp!("{=u32:us}", COUNT.fetch_add(1, Ordering::Relaxed));
 
 /// Tell the Boot ROM about our application
 #[unsafe(link_section = ".start_block")]
@@ -112,15 +115,10 @@ fn main() -> ! {
     led_uv.output_to(pins.gpio5);
     led_uv.set_duty_cycle_percent(75).unwrap(); // Start with LED off
 
+    let mut command = hidcust::CustomHidCommand::default();
     loop {
-        let mut command = hidcust::CustomHidCommand::default();
         match hid.device().read_report(&mut command) {
-            Ok(()) => {
-                info!(
-                    "Received command: wh={} ir={} uv={}",
-                    command.wh, command.ir, command.uv
-                );
-
+            Ok(_) => {
                 led_ir.set_duty_cycle_percent(min(command.ir, 100)).unwrap();
                 led_wh.set_duty_cycle_percent(min(command.wh, 100)).unwrap();
                 led_uv.set_duty_cycle_percent(min(command.uv, 100)).unwrap();
