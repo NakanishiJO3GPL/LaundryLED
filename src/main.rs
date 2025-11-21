@@ -8,7 +8,7 @@ use core::cmp::min;
 use core::sync::atomic::{AtomicU32, Ordering};
 use defmt::*;
 use defmt_rtt as _;
-use embedded_hal::pwm::SetDutyCycle;
+use embedded_hal::{digital::OutputPin, pwm::SetDutyCycle};
 use panic_probe as _;
 use rp235x_hal::clocks::init_clocks_and_plls;
 use rp235x_hal::{self as hal, entry, pac, Clock};
@@ -115,6 +115,11 @@ fn main() -> ! {
     led_uv.output_to(pins.gpio5);
     led_uv.set_duty_cycle_percent(0).unwrap(); // Start with LED off
 
+    // Set GPIO25 (onboard LED) as output to indicate activity
+    let mut led_onboard = pins.gpio25.into_push_pull_output();
+    led_onboard.set_high().unwrap();
+
+    // Main loop
     let mut command = hidcust::CustomHidCommand::default();
     loop {
         match hid.device().read_report(&mut command) {
