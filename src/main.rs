@@ -94,26 +94,26 @@ fn main() -> ! {
     let pwm1 = &mut pwm_slices.pwm1;
     pwm1.set_ph_correct();
     pwm1.set_top(top);
-    pwm1.set_div_int(1);
+    pwm1.set_div_int(50);
     pwm1.set_div_frac(0);
     pwm1.enable();
     let led_ir = &mut pwm1.channel_b;
     led_ir.output_to(pins.gpio3);
-    led_ir.set_duty_cycle_percent(50).unwrap(); // Start with LED off
+    led_ir.set_duty_cycle_percent(0).unwrap(); // Start with LED off
 
     // PWM2A: GPIO4, PWM2B: GPIO5
     let pwm2 = &mut pwm_slices.pwm2;
     pwm2.set_ph_correct();
     pwm2.set_top(top);
-    pwm2.set_div_int(1);
+    pwm2.set_div_int(50);
     pwm2.set_div_frac(0);
     pwm2.enable();
     let led_wh = &mut pwm2.channel_a;
     led_wh.output_to(pins.gpio4);
-    led_wh.set_duty_cycle_percent(25).unwrap(); // Start with LED off
+    led_wh.set_duty_cycle_percent(0).unwrap(); // Start with LED off
     let led_uv = &mut pwm2.channel_b;
     led_uv.output_to(pins.gpio5);
-    led_uv.set_duty_cycle_percent(75).unwrap(); // Start with LED off
+    led_uv.set_duty_cycle_percent(0).unwrap(); // Start with LED off
 
     let mut command = hidcust::CustomHidCommand::default();
     loop {
